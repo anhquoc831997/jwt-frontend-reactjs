@@ -12,7 +12,7 @@ function App() {
   return (
     <Router>
       <div className='app-container'>
-        <Nav />
+        {/* <Nav /> */}
         <Switch>
           <Route path="/about">
             about
