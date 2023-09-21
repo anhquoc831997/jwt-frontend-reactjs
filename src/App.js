@@ -7,6 +7,7 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import Register from './components/Register/Register';
 
 function App() {
   return (
@@ -28,6 +29,9 @@ function App() {
           </Route>
           <Route path="/login">
             <Login />
+          </Route>
+          <Route path="/register">
+            <Register />
           </Route>
           <Route path="*">
             404 not found
