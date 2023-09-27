@@ -2,10 +2,97 @@ import React from 'react';
 import './Login.scss'
 import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { useState } from 'react';
+import { loginUser } from "../../services/userService"
+import { toast } from 'react-toastify';
 const Login = (props) => {
     let history = useHistory();
+
+    const [valueLogin, setValueLogin] = useState("");
+    const [password, setPassword] = useState("");
+    const [errors, setErrors] = useState({
+        valueLogin: '',
+        validValueLogin: 'form-control',
+        password: '',
+        validPassword: 'form-control',
+    });
     const handleCreateNewAccount = () => {
         history.push('/register');
+    }
+    const handleBlur = (field) => {
+        const newErrors = { ...errors };
+        const phoneRegex = /^[0-9]{10}$/; // Mã regex cho số điện thoại 10 chữ số
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;// Mã regex cho email
+
+        switch (field) {
+            case 'valueLogin':
+                if (!valueLogin) {
+                    newErrors.valueLogin = "Please enter your email address or phone number";
+                    newErrors.validValueLogin = 'form-control is-invalid';
+                }
+                else {
+                    if (emailRegex.test(valueLogin) || phoneRegex.test(valueLogin)) {
+                        newErrors.valueLogin = "";
+                        newErrors.validValueLogin = 'form-control is-valid';
+                    }
+                    else {
+                        newErrors.valueLogin = "Please enter a valid email or phone number (10 digits) format";
+                        newErrors.validValueLogin = 'form-control is-invalid';
+                    }
+                }
+                break;
+
+            case 'password':
+                if (!password) {
+                    newErrors.password = "Please enter your password";
+                    newErrors.validPassword = 'form-control is-invalid';
+                }
+                else {
+                    newErrors.password = "";
+                    newErrors.validPassword = 'form-control is-valid';
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        setErrors(newErrors);
+    }
+    const isValidInputs = () => {
+        let isValid = true;
+        const newErrors = { ...errors };
+        if (!valueLogin) {
+            newErrors.valueLogin = "Please enter your email address or phone number";
+            isValid = false;
+        }
+        else {
+            newErrors.valueLogin = "";
+
+        }
+        if (!password) {
+            newErrors.password = "Please enter your password";
+            isValid = false;
+        }
+        else {
+            newErrors.password = "";
+        }
+        setErrors(newErrors);
+        return isValid;
+    }
+    const handleLogin = async () => {
+        let check = isValidInputs();
+        if (check) {
+            let response = await loginUser(valueLogin, password);
+            let dataService = response.data;
+            if (dataService.EC == 0) {
+                toast.success(dataService.EM);
+                history.push('/home');
+            }
+            else {
+                toast.error(dataService.EM);
+            }
+        }
     }
     return (
         <div className='login-container'>
@@ -23,11 +110,27 @@ const Login = (props) => {
                         <div className='brand d-sm-none'>
                             Facebook
                         </div>
-                        <input type='text' className='form-control' placeholder='Email address or phone number'>
-                        </input>
-                        <input type='password' className='form-control' placeholder='Password'>
-                        </input>
-                        <button className='btn btn-primary'>
+                        <input
+                            type='text'
+                            className={errors.validValueLogin}
+                            placeholder='Email address or phone number'
+                            value={valueLogin}
+                            onChange={(event) => { setValueLogin(event.target.value) }}
+                            onBlur={() => handleBlur("valueLogin")}
+                        />
+                        {errors.valueLogin && <div className="error">{errors.valueLogin}</div>}
+                        {/* <div className="error">test</div> */}
+                        <input
+                            type='password'
+                            className={errors.validPassword}
+                            placeholder='Password'
+                            value={password}
+                            onChange={(event) => { setPassword(event.target.value) }}
+                            onBlur={() => handleBlur("password")}
+
+                        />
+                        {errors.password && <div className="error">{errors.password}</div>}
+                        <button className='btn btn-primary' onClick={() => handleLogin()}>
                             Login
                         </button>
                         <span className='text-center'>

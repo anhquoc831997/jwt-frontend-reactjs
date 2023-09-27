@@ -51,5 +51,12 @@
                 text-decoration: underline;
             }
         }
+
+        .error {
+            color: red;
+            /* Màu đỏ đậm */
+            font-size: 14px;
+            font-weight: bold;
+        }
     }
 }
