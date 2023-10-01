@@ -87,11 +87,22 @@ const Login = (props) => {
             let dataService = response.data;
             if (dataService.EC == 0) {
                 toast.success(dataService.EM);
-                history.push('/home');
+                let data = {
+                    isAuthenticated: true,
+                    token: 'fake token'
+                }
+                sessionStorage.setItem("account", JSON.stringify(data));
+                history.push('/users');
+                window.location.reload();
             }
             else {
                 toast.error(dataService.EM);
             }
+        }
+    }
+    const handlePressEnter = (event) => {
+        if (event.charCode === 13) {
+            handleLogin();
         }
     }
     return (
@@ -127,7 +138,7 @@ const Login = (props) => {
                             value={password}
                             onChange={(event) => { setPassword(event.target.value) }}
                             onBlur={() => handleBlur("password")}
-
+                            onKeyPress={(event) => handlePressEnter(event)}
                         />
                         {errors.password && <div className="error">{errors.password}</div>}
                         <button className='btn btn-primary' onClick={() => handleLogin()}>
